@@ -1,0 +1,3 @@
+[submodule "apps/filmes-flix"]
+	path = apps/filmes-flix
+	url = https://github.com/GuerraAna/FilmesFlix.git

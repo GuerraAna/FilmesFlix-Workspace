@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  bff:
+    name: BFF (services/filmes-api)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/filmes-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew test
+
+  contract:
+    name: Contrato (contracts/openapi.yaml)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx --yes @redocly/cli@1 lint contracts/openapi.yaml

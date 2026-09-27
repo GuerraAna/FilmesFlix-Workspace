@@ -1,0 +1,5 @@
+[
+  { "id": 1, "title": "Interstellar", "posterUrl": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "overview": "Um grupo de exploradores usa um buraco de minhoca para viajar além dos limites do sistema solar.", "releaseDate": "2014-11-06" },
+  { "id": 2, "title": "Inception", "posterUrl": "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg", "overview": "Um ladrão que rouba segredos por meio de sonhos recebe a missão inversa: plantar uma ideia.", "releaseDate": "2010-08-06" },
+  { "id": 3, "title": "The Matrix", "posterUrl": "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg", "overview": null, "releaseDate": "1999-05-21" }
+]

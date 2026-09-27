@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: FilmesFlix BFF
+  version: 0.1.0
+  description: |
+    Backend-for-Frontend do app FilmesFlix. Este arquivo é a fonte da verdade do contrato:
+    o BFF (`services/filmes-api`) implementa e o app (`apps/filmes-flix`) consome.
+servers:
+  - url: http://localhost:8080
+    description: BFF local
+tags:
+  - name: movies
+paths:
+  /v1/movies:
+    get:
+      tags: [movies]
+      operationId: listMovies
+      summary: Lista de filmes exibida na tela inicial
+      responses:
+        '200':
+          description: Lista de filmes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieSummary'
+        '500':
+          $ref: '#/components/responses/Problem'
+  /v1/movies/{id}:
+    get:
+      tags: [movies]
+      operationId: getMovieById
+      summary: Detalhes de um filme (slice 001/002)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Filme encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieDetail'
+        '404':
+          $ref: '#/components/responses/Problem'
+        '500':
+          $ref: '#/components/responses/Problem'
+components:
+  schemas:
+    MovieSummary:
+      type: object
+      required: [id, title, posterUrl]
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+        posterUrl:
+          type: string
+          format: uri
+    MovieDetail:
+      allOf:
+        - $ref: '#/components/schemas/MovieSummary'
+        - type: object
+          properties:
+            overview:
+              type: string
+            releaseDate:
+              type: string
+              format: date
+    Problem:
+      description: RFC 9457 Problem Details
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+  responses:
+    Problem:
+      description: Erro
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
