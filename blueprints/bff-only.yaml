@@ -1,0 +1,28 @@
+# Blueprint: FilmesFlix — BFF apenas (services/filmes-api dentro do FilmesFlix-Workspace)
+# Kotlin + Spring Boot 3 (WebFlux), Gradle 8.12, toolchain Java 17.
+initialize:
+  - run: |
+      set -e
+      mkdir -p "$HOME/.jdks/jdk17"
+      curl -sL "https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse" \
+        | tar -xz -C "$HOME/.jdks/jdk17" --strip-components=1
+      mkdir -p "$HOME/.gradle"
+      echo "org.gradle.java.installations.paths=$HOME/.jdks/jdk17" >> "$HOME/.gradle/gradle.properties"
+maintenance:
+  - run: |
+      git submodule update --init apps/filmes-flix || true
+knowledge:
+  - name: build
+    contents: |
+      cd services/filmes-api && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew build
+  - name: test
+    contents: |
+      cd services/filmes-api && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew test
+  - name: lint
+    contents: |
+      npx --yes @redocly/cli lint contracts/openapi.yaml
+  - name: startup
+    contents: |
+      cd services/filmes-api && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew bootRun
+      # Sobe em http://localhost:8080 — smoke: curl localhost:8080/v1/movies e /v1/movies/1
+      # Fonte de dados: mock local (filmes.source=mock em application.yaml)

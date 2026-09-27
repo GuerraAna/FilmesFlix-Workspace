@@ -44,17 +44,29 @@ git submodule update --init --recursive
 
 | # | Slice | Escopo | Status |
 |---|---|---|---|
-| 000 | Workspace setup | estrutura, AGENTS.md, contrato inicial, esqueleto do BFF | em andamento |
-| 001 | Tela de detalhes do filme | só app (aprender o ciclo) | planejada |
-| 002 | BFF servindo a lista de filmes | contrato + BFF + app apontando pro BFF | planejada |
+| 000 | Workspace setup | estrutura, AGENTS.md, contrato inicial, esqueleto do BFF | concluída |
+| 001 | Tela de detalhes do filme | só app (aprender o ciclo) | concluída |
+| 002 | App consome o BFF | app apontando pro BFF (lista + detalhe) | concluída |
 | 003 | Favoritos persistidos no BFF | slice completa contrato → BFF → app | planejada |
 
 ## Rodando
 
-```bash
-# BFF
-cd services/filmes-api && ./gradlew bootRun     # http://localhost:8080/v1/movies
+Pré-requisitos (detalhes em `AGENTS.md` → "Ambiente de desenvolvimento"):
 
-# App
-cd apps/filmes-flix && ./gradlew installDebug
+- **JDK 17** para o BFF e **JDK 11** para o app — o `java` padrão do shell não serve para os dois.
+- Android SDK com `platforms;android-30` + `build-tools;30.0.3` e `apps/filmes-flix/local.properties` com `sdk.dir=...`.
+- Blueprints prontos em `environment.yaml` (raiz, acoplado) e `blueprints/bff-only.yaml` — o app também tem o seu em `GuerraAna/FilmesFlix`.
+
+```bash
+JDK17=/opt/homebrew/opt/openjdk@17   # macOS+brew; ajuste pro seu OS
+JDK11=/opt/homebrew/opt/openjdk@11
+
+# Só BFF
+cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew bootRun     # http://localhost:8080/v1/movies
+
+# Só app (testes/build; rodar no emulador exige o BFF no ar)
+cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest
+
+# Acoplado: BFF no ar + emulador Android 11+ aberto
+cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew installDebug   # app chama http://10.0.2.2:8080/
 ```

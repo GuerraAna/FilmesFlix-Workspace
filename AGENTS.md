@@ -38,12 +38,48 @@ Leia este arquivo inteiro antes de qualquer alteração.
   depois do merge lá.
 - **Não invente API externa.** Se a API de filmes não tiver o dado, use o mock e registre a limitação na slice.
 - **Comandos de verificação** (rodar antes de finalizar):
-  - BFF: `cd services/filmes-api && ./gradlew test`
-  - App: `cd apps/filmes-flix && ./gradlew testDebugUnitTest`
+  - BFF: `cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew test`
+  - App: `cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest`
   - Contrato: `npx @redocly/cli lint contracts/openapi.yaml`
+
 - **Commits** seguem Conventional Commits com escopo: `feat(bff): ...`, `feat(app): ...`, `docs(slice): ...`,
   `chore(contract): ...`.
 - **Idioma:** documentação e specs em português; código, nomes de classes e mensagens de commit em inglês.
+
+## Ambiente de desenvolvimento
+
+Cada módulo exige uma JVM diferente — não assuma que o `java` padrão do shell serve:
+
+| Módulo | Ferramenta | JVM exigida | Por quê |
+|---|---|---|---|
+| `services/filmes-api` | Gradle 8.12, Spring Boot 3 | **JDK 17** (toolchain) | `build.gradle.kts` fixa `languageVersion = 17` |
+| `apps/filmes-flix` | Gradle 6.5, AGP 4.1.1 | **JDK 11** | Gradle 6.5 não roda em JVM > 14 |
+| `contracts/` | redocly via `npx` | Node 20+ | lint do OpenAPI |
+
+Setup macOS (brew, sem sudo):
+
+```bash
+brew install openjdk@17 openjdk@11
+JDK17=/opt/homebrew/opt/openjdk@17   # ajuste se não for Apple Silicon
+JDK11=/opt/homebrew/opt/openjdk@11
+# Gradle não detecta JDKs keg-only do brew sozinho:
+echo "org.gradle.java.installations.paths=$JDK17/libexec/openjdk.jdk/Contents/Home,$JDK11/libexec/openjdk.jdk/Contents/Home" \
+  >> ~/.gradle/gradle.properties
+```
+
+App Android:
+
+- SDK precisa de `platforms;android-30` e `build-tools;30.0.3` (`compileSdkVersion 30` no `app/build.gradle`).
+- Crie `apps/filmes-flix/local.properties` com `sdk.dir=<caminho do Android SDK>` (arquivo gitignored).
+- O app chama o BFF em `http://10.0.2.2:8080/` (`data/remote/MovieApiClient.kt`) — loopback do
+  **emulador** para o host. Em aparelho físico, troque pelo IP da máquina na rede.
+- `usesCleartextTraffic="true"` está liberado no manifest porque o BFF local é HTTP.
+
+Modos de execução (detalhes nos blueprints `environment.yaml` na raiz e em `blueprints/`):
+
+- **Só BFF**: `cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew bootRun` → `curl localhost:8080/v1/movies`
+- **Só app**: `cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest` (compila/testa sem backend; rodar no emulador exige o BFF no ar)
+- **Acoplado**: suba o BFF (`bootRun`), abra um emulador Android 11+ e `JAVA_HOME=$JDK11 ./gradlew installDebug` no app.
 
 ## Convenções do app (`apps/filmes-flix`)
 
