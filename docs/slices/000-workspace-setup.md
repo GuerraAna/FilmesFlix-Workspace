@@ -21,13 +21,22 @@ Architecture) como front e um BFF próprio em Spring como backend. Decisões des
 5. [x] Configurar CI (GitHub Actions) rodando `./gradlew test` do BFF e lint do contrato
 
 ## Critérios de aceite
-- [ ] `git clone --recurse-submodules` traz o app
-- [ ] `cd services/filmes-api && ./gradlew test` passa
-- [ ] `curl localhost:8080/v1/movies` retorna a lista do mock
+- [x] `git clone --recurse-submodules` traz o app
+- [x] `cd services/filmes-api && ./gradlew test` passa
+- [x] `curl localhost:8080/v1/movies` retorna a lista do mock
 
 ## Fora de escopo
 - Alterar qualquer código do app (isso começa na slice 001)
 - Integração real com TMDB
 
 ## Retrospectiva
-- (preencher após concluir o checkpoint 5)
+- O que a IA acertou de primeira: estrutura de pastas, AGENTS.md completo (incluindo a tabela
+  de JVMs por módulo e os comandos de verificação), contrato OpenAPI inicial, esqueleto do BFF
+  com testes `@WebFluxTest` e unitário do service já passando.
+- Onde precisou de correção humana: o contrato inicial falhou no lint do redocly na primeira
+  execução da CI — faltava `security: []` explícito e uma resposta 4xx em `GET /v1/movies`
+  (corrigido em `fbf4336`, PR #1). A CI pegou o problema antes do merge, validando a decisão
+  de configurá-la nesta slice.
+- Ajustes feitos no AGENTS.md por causa desta slice: nenhum — as regras iniciais se mantiveram.
+- Tempo gasto (estimado) vs. sem IA: ~1h com IA vs. ~4h estimadas sem IA (o boilerplate de
+  Gradle Kotlin DSL + WebFlux + testes teria consumido a maior parte do tempo).

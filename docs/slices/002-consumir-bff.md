@@ -32,11 +32,11 @@ BFF próprio (`services/filmes-api`), que expõe o contrato em inglês definido 
 4. **Verificação** — rodar todos os comandos de `AGENTS.md`; corrigir falhas.
 
 ## Critérios de aceite
-- [ ] Com o BFF no ar (`localhost:8080`), a lista do app mostra os filmes do mock do BFF
-- [ ] Tocar em um filme abre detalhes com descrição e data vindas de `GET /v1/movies/{id}`
-- [ ] Falha de rede na lista gera `UiState.Error` (Toast); no detalhe, descrição/data caem no
+- [x] Com o BFF no ar (`localhost:8080`), a lista do app mostra os filmes do mock do BFF
+- [x] Tocar em um filme abre detalhes com descrição e data vindas de `GET /v1/movies/{id}`
+- [x] Falha de rede na lista gera `UiState.Error` (Toast); no detalhe, descrição/data caem no
   texto padrão
-- [ ] `./gradlew testDebugUnitTest` (app), `./gradlew test` (BFF) e `redocly lint` passam
+- [x] `./gradlew testDebugUnitTest` (app), `./gradlew test` (BFF) e `redocly lint` passam
 
 ## Fora de escopo
 - Integração real com TMDB (BFF continua servindo o mock local)
@@ -50,8 +50,15 @@ os dois endpoints: comece pelo checkpoint 3 (app) em uma branch feature/002-cons
 a partir de codebase_inicial. Rode ./gradlew testDebugUnitTest ao final.
 ```
 
-## Retrospectiva (preencher ao final)
-- O que a IA acertou de primeira:
-- Onde precisou de correção humana:
-- Ajustes feitos no AGENTS.md por causa desta slice:
-- Tempo gasto (estimado) vs. sem IA:
+## Retrospectiva
+- O que a IA acertou de primeira: a tradução DTO (inglês) → domínio (português) via
+  `data/mapper` saiu sem retrabalho, o `DateFormatter` foi migrado para ISO mantendo a
+  exibição `dd/MM/yyyy`, e o manifest ganhou `usesCleartextTraffic` já justificado.
+- Onde precisou de correção humana: todos os checkpoints do app foram entregues em um único
+  commit (`cff4294`) em vez de um commit por camada — a granularidade do checkpoint precisou
+  ser reforçada na revisão. A validação ponta a ponta (emulador + BFF no ar) foi manual.
+- Ajustes feitos no AGENTS.md por causa desta slice: documentação do loopback do emulador
+  (`10.0.2.2`), do `usesCleartextTraffic` e da regra "campos em inglês no BFF, português no
+  domínio legado, tradução no mapper".
+- Tempo gasto (estimado) vs. sem IA: ~2h com IA vs. ~5h estimadas sem IA (Retrofit + camadas
+  + testes + depuração de rede do emulador).
