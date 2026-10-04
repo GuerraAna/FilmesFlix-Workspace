@@ -1,3 +1,32 @@
+# --- Sistema operacional ---
 .DS_Store
+Thumbs.db
+
+# --- IDEs ---
 .idea/
 *.iml
+.vscode/
+
+# --- Arquivos locais/sensíveis (NUNCA commitar) ---
+# Caminho do Android SDK é específico de cada máquina (ex: /Users/<voce>/...)
+local.properties
+**/local.properties
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+*.jks
+secrets.*
+**/secrets/
+
+# Configurações locais do Gradle (cache e credenciais ficam em ~/.gradle)
+.gradle/
+**/build/
+
+# --- Ferramentas ---
+node_modules/
+*.log
