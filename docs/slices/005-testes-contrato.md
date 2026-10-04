@@ -20,7 +20,7 @@ O AGENTS.md menciona "teste de contrato garantindo que DTOs do app batem com ope
 - [x] Testes falham se o OpenAPI ou os DTOs forem alterados de forma inconsistente (campo não declarado → `fail`; required ausente → `assertTrue` falha)
 - [x] Testes passam: BFF `./gradlew test` (12 testes), app `./gradlew testDebugUnitTest` (3 contrato + demais)
 - [x] AGENTS.md atualizado (seção "Testes de contrato" nos comandos de verificação)
-- [x] PR aberta no app: GuerraAna/FilmesFlix#4 (branch `feature/005-contract-tests`, sem merge — aguardando revisão)
+- [x] PR aberta no app: GuerraAna/FilmesFlix#6 (branch `feature/contract-tests-and-coverage`, sem merge — aguardando revisão)
 
 ## Fora de escopo
 - Alterar funcionalidade do app ou BFF

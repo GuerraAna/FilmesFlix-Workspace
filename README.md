@@ -49,12 +49,13 @@ git submodule update --init --recursive
 | 002 | App consome o BFF | app apontando pro BFF (lista + detalhe) | concluída |
 | 003 | Favoritos persistidos no BFF | slice completa contrato → BFF → app | planejada |
 | 004 | Completar setup inicial | checkboxes, retrospectivas, CI, .gitignore | concluída |
-| 005 | Testes de contrato | validar DTOs do app e BFF vs OpenAPI | concluída — PR GuerraAna/FilmesFlix#4 aguardando merge |
-| 006 | Coverage reports | JaCoCo + testes de ViewModel | concluída — PR GuerraAna/FilmesFlix#5 aguardando merge |
+| 005 | Testes de contrato | validar DTOs do app e BFF vs OpenAPI | concluída — PR GuerraAna/FilmesFlix#6 aguardando merge |
+| 006 | Coverage reports | JaCoCo + testes de ViewModel | concluída — PR GuerraAna/FilmesFlix#6 aguardando merge |
 | 007 | Automatizar pipeline de slices | `scripts/run-slice.sh` com medição de tempo | concluída |
 
-> As PRs do app (#4, #5) ficam abertas sem merge até revisão; depois do merge lá, o ponteiro
-> do submodule é atualizado aqui (regra do AGENTS.md).
+> As mudanças do app (slices 005+006) estão consolidadas em uma única PR
+> (GuerraAna/FilmesFlix#6, branch `feature/contract-tests-and-coverage`) sem merge até
+> revisão; depois do merge lá, o ponteiro do submodule é atualizado aqui (regra do AGENTS.md).
 
 ## Rodando
 
