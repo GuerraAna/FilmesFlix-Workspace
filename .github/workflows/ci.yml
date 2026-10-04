@@ -19,7 +19,39 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew test
+      - run: ./gradlew test jacocoTestReport jacocoTestCoverageVerification
+      - name: Upload coverage report (BFF)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bff-jacoco-report
+          path: services/filmes-api/build/reports/jacoco/
+          retention-days: 14
+
+  app:
+    name: App (apps/filmes-flix)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/filmes-flix
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew testDebugUnitTest jacocoTestReport
+      - name: Upload coverage report (app)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jacoco-report
+          path: apps/filmes-flix/app/build/reports/jacoco/
+          retention-days: 14
 
   contract:
     name: Contrato (contracts/openapi.yaml)
