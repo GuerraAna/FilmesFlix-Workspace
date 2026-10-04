@@ -37,6 +37,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Submodule GuerraAna/FilmesFlix is private — GITHUB_TOKEN only
+          # covers this repo. APP_SUBMODULE_TOKEN is a fine-grained PAT
+          # with Contents: Read on FilmesFlix (see README/AGENTS.md).
+          token: ${{ secrets.APP_SUBMODULE_TOKEN }}
           submodules: true
       - uses: actions/setup-java@v4
         with:

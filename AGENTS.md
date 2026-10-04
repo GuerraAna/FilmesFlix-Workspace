@@ -99,6 +99,17 @@ Modos de execução (detalhes nos blueprints `environment.yaml` na raiz e em `bl
 - Model atual: `Movie(id, titulo, imagem, descricao, dataLancamento)` — campos em português vêm da API
   legada; o BFF deve expor nomes em inglês e o app mapeia via `mapper`.
 
+## CI: submodule privado
+
+`apps/filmes-flix` é um **repositório privado** (`GuerraAna/FilmesFlix`). O `GITHUB_TOKEN` do
+Actions só cobre o workspace — sem secret extra, o checkout do submodule falha com
+`Repository not found` (GitHub devolve 404, não 403, para não vazar a existência do repo).
+
+Para o job `app` funcionar, o workflow usa `secrets.APP_SUBMODULE_TOKEN`: um fine-grained
+PAT com `Contents: Read` em **dois** repositórios — `FilmesFlix` e `FilmesFlix-Workspace`
+(o token do checkout também clona o repo principal). Se o secret não existir, o job `app`
+falha no checkout; BFF e contrato não dependem dele.
+
 ## Convenções do BFF (`services/filmes-api`)
 
 - Pacote raiz: `com.guerraana.filmesapi`.
