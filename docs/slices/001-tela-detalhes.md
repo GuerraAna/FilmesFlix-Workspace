@@ -19,10 +19,10 @@ ciclo spec → implementação → revisão **sem** envolver o BFF ainda.
 4. **Testes** — unitário para o formatador de data e para o mapeamento `Movie -> DetailUiModel`.
 
 ## Critérios de aceite
-- [ ] Tocar em um filme na lista abre a tela de detalhes com poster, título, data e descrição
-- [ ] Filmes sem descrição mostram "Descrição indisponível"
-- [ ] Botão voltar retorna para a lista sem recarregar a API
-- [ ] `./gradlew testDebugUnitTest` passa
+- [x] Tocar em um filme na lista abre a tela de detalhes com poster, título, data e descrição
+- [x] Filmes sem descrição mostram "Descrição indisponível"
+- [x] Botão voltar retorna para a lista sem recarregar a API
+- [x] `./gradlew testDebugUnitTest` passa
 
 ## Fora de escopo
 - Migrar para Compose
@@ -37,7 +37,15 @@ revisão. Não implemente a tela ainda.
 ```
 
 ## Retrospectiva
-- O que a IA acertou de primeira:
-- Onde precisou de correção humana:
-- Ajustes feitos no AGENTS.md por causa desta slice:
-- Tempo gasto (estimado) vs. sem IA:
+- O que a IA acertou de primeira: cada checkpoint virou um commit limpo no app
+  (`073b3d8` refactor, `4772670` navegação, `6813e10` tela, `75880dc` testes), a remoção de
+  `kotlin-android-extensions` foi feita sem quebrar telas existentes, e os testes de
+  `DateFormatter` + `Movie -> DetailUiModel` nasceram junto com a implementação.
+- Onde precisou de correção humana: revisão de detalhes visuais no layout (dimens/estilo)
+  e validação manual no emulador — o comportamento "voltar sem recarregar" só pôde ser
+  conferido rodando o app, não por teste unitário.
+- Ajustes feitos no AGENTS.md por causa desta slice: registro explícito de que novas telas
+  usam ViewBinding (synthetics deprecado) e que a View nunca recebe `Movie` cru — passa por
+  `UiState`/UiModel.
+- Tempo gasto (estimado) vs. sem IA: ~1h30 com IA vs. ~4h estimadas sem IA (a migração de
+  synthetics para ViewBinding e a organização em camadas seriam os maiores consumidores).

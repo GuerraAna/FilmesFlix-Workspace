@@ -38,9 +38,17 @@ Leia este arquivo inteiro antes de qualquer alteração.
   depois do merge lá.
 - **Não invente API externa.** Se a API de filmes não tiver o dado, use o mock e registre a limitação na slice.
 - **Comandos de verificação** (rodar antes de finalizar):
-  - BFF: `cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew test`
-  - App: `cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest`
+  - BFF: `cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew test jacocoTestCoverageVerification`
+  - App: `cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest jacocoTestReport`
   - Contrato: `npx @redocly/cli lint contracts/openapi.yaml`
+  - Tudo de uma vez (com medição de tempo por checkpoint): `./scripts/run-slice.sh NNN`
+- **Testes de contrato.** `ContractTest` (BFF: `api/ContractTest.kt`; app: `data/remote/ContractTest.kt`)
+  parseia `contracts/openapi.yaml` e valida os DTOs. No app, o teste é pulado via JUnit
+  assumption quando o clone é standalone (o contrato só existe dentro do workspace).
+- **Coverage.** JaCoCo nos dois módulos com `jacocoTestCoverageVerification`: BFF ≥ 70% linhas
+  (geral) e ≥ 80% em `domain`; app ≥ 50% geral e ≥ 80% em `domain.*`. Reports HTML em
+  `*/build/reports/jacoco/`. Excluídos da medição: classes geradas, Activities/Adapters e
+  plumbing de rede (API client/repository impl).
 
 - **Commits** seguem Conventional Commits com escopo: `feat(bff): ...`, `feat(app): ...`, `docs(slice): ...`,
   `chore(contract): ...`.
