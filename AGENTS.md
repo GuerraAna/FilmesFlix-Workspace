@@ -104,16 +104,13 @@ Modos de execução (detalhes nos blueprints `environment.yaml` na raiz e em `bl
 - Model atual: `Movie(id, title, posterUrl, overview, releaseDate)` — nomes em inglês,
   alinhados ao contrato; o app mapeia DTO → Entity → Domain via `data/mapper`.
 
-## CI: submodule privado
+## CI: checkout do submodule
 
-`apps/filmes-flix` é um **repositório privado** (`GuerraAna/FilmesFlix`). O `GITHUB_TOKEN` do
-Actions só cobre o workspace — sem secret extra, o checkout do submodule falha com
-`Repository not found` (GitHub devolve 404, não 403, para não vazar a existência do repo).
-
-Para o job `app` funcionar, o workflow usa `secrets.APP_SUBMODULE_TOKEN`: um fine-grained
-PAT com `Contents: Read` em **dois** repositórios — `FilmesFlix` e `FilmesFlix-Workspace`
-(o token do checkout também clona o repo principal). Se o secret não existir, o job `app`
-falha no checkout; BFF e contrato não dependem dele.
+`apps/filmes-flix` é um repositório **público** (`GuerraAna/FilmesFlix`). O `GITHUB_TOKEN`
+do Actions consegue clonar o submodule sem secret extra (`submodules: true` no job `app`).
+Se o repo do app voltar a ser privado, o job precisa de um secret `APP_SUBMODULE_TOKEN`
+(fine-grained PAT com `Contents: Read` nos dois repos) adicionado ao `token:` do checkout —
+como era antes da publicação.
 
 ## Convenções do BFF (`services/filmes-api`)
 

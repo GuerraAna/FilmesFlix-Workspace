@@ -26,19 +26,24 @@ a stack atual exigida em vagas Android: Jetpack Compose, Coroutines/Flow, Hilt, 
    (Java 17, android-35), `scripts/run-slice.sh`, README.
 
 ## Critérios de aceite
-- [ ] `cd apps/filmes-flix && JAVA_HOME=$JDK17 ./gradlew testDebugUnitTest jacocoTestReport` passa
-- [ ] Coverage ≥50% geral / ≥80% `domain.*` mantido
-- [ ] App lista filmes e abre detalhe via navegação Compose (mesmas rotas do contrato)
-- [ ] Cache Room: segunda abertura exibe dados sem rede
-- [ ] BFF e contrato intocados (`redocly lint` e testes do BFF continuam passando)
+- [x] `cd apps/filmes-flix && JAVA_HOME=$JDK17 ./gradlew testDebugUnitTest jacocoTestReport` passa
+- [x] Coverage ≥50% geral / ≥80% `domain.*` mantido
+- [x] App lista filmes e abre detalhe via navegação Compose (mesmas rotas do contrato)
+- [x] Cache Room: segunda abertura exibe dados sem rede
+- [x] BFF e contrato intocados (`redocly lint` e testes do BFF continuam passando)
 
 ## Fora de escopo
 - Novos endpoints ou features de negócio
 - Modularização multi-módulo (app continua single-module)
 - Publicação no Play Store
 
-## Retrospectiva (preencher ao final)
-- O que a IA acertou de primeira:
-- Onde precisou de correção humana:
-- Ajustes feitos no AGENTS.md por causa desta slice:
-- Tempo gasto (estimado) vs. sem IA:
+## Retrospectiva (preenchida)
+- O que a IA acertou de primeira: migração integral da stack (toolchain, Compose, Flow, Hilt,
+  Room) compilando de primeira; 20 testes verdes após ajuste dos testes de StateFlow.
+- Onde precisou de correção humana: testes de ViewModel com `UnconfinedTestDispatcher` não
+  capturavam todos os estados — trocado para `StandardTestDispatcher` compartilhado com `runTest`;
+  sintaxe JaCoCo no Kotlin DSL precisou de ajuste.
+- Ajustes feitos no AGENTS.md por causa desta slice: JDK único (17) para BFF e app, convenções
+  Compose/StateFlow/Hilt/Room, seção de CI atualizada para submodule público.
+- Tempo gasto (estimado) vs. sem IA: migração completa em uma sessão; manualmente seria
+  um trabalho de vários dias (reescrita de UI, DI, camada de dados e testes).

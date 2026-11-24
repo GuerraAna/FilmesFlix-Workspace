@@ -1,25 +1,23 @@
 # Blueprint: FilmesFlix — ACOPLADO (app + BFF no FilmesFlix-Workspace)
-# BFF: Gradle 8.12 + JDK 17 | App: Gradle 6.5 + AGP 4.1.1 (JDK 11) + Android SDK 30.
+# BFF: Gradle 8.12 + JDK 17 | App: Gradle 8.10 + AGP 8.6 (JDK 17) + Android SDK 35.
 initialize:
   - run: |
       set -e
-      # JDKs portáteis (Temurin) — BFF exige 17 (toolchain), app exige 11 (Gradle 6.5)
-      mkdir -p "$HOME/.jdks/jdk17" "$HOME/.jdks/jdk11"
+      # JDK 17 portátil (Temurin) — BFF e app usam a mesma JVM
+      mkdir -p "$HOME/.jdks/jdk17"
       curl -sL "https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse" \
         | tar -xz -C "$HOME/.jdks/jdk17" --strip-components=1
-      curl -sL "https://api.adoptium.net/v3/binary/latest/11/ga/linux/x64/jdk/hotspot/normal/eclipse" \
-        | tar -xz -C "$HOME/.jdks/jdk11" --strip-components=1
       mkdir -p "$HOME/.gradle"
-      echo "org.gradle.java.installations.paths=$HOME/.jdks/jdk17,$HOME/.jdks/jdk11" >> "$HOME/.gradle/gradle.properties"
+      echo "org.gradle.java.installations.paths=$HOME/.jdks/jdk17" >> "$HOME/.gradle/gradle.properties"
       # App é submodule
       git submodule update --init apps/filmes-flix
-      # Android cmdline-tools + platform 30 + build-tools 30.0.3
+      # Android cmdline-tools + platform 35 + build-tools 35.0.0
       mkdir -p "$HOME/android-sdk/cmdline-tools"
       curl -sL "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -o /tmp/ct.zip
       unzip -q /tmp/ct.zip -d /tmp/ct
       mv /tmp/ct/cmdline-tools "$HOME/android-sdk/cmdline-tools/latest"
       yes | "$HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$HOME/android-sdk" \
-        "platforms;android-30" "build-tools;30.0.3" <<< "y"
+        "platforms;android-35" "build-tools;35.0.0" <<< "y"
       echo "sdk.dir=$HOME/android-sdk" > apps/filmes-flix/local.properties
 maintenance:
   - run: |
@@ -31,13 +29,13 @@ knowledge:
       # BFF
       cd services/filmes-api && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew test && cd -
       # App
-      cd apps/filmes-flix && JAVA_HOME="$HOME/.jdks/jdk11" ./gradlew testDebugUnitTest && cd -
+      cd apps/filmes-flix && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew testDebugUnitTest && cd -
       # Contrato
       npx --yes @redocly/cli lint contracts/openapi.yaml
   - name: build
     contents: |
       cd services/filmes-api && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew build && cd -
-      cd apps/filmes-flix && JAVA_HOME="$HOME/.jdks/jdk11" ./gradlew assembleDebug && cd -
+      cd apps/filmes-flix && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew assembleDebug && cd -
   - name: lint
     contents: |
       npx --yes @redocly/cli lint contracts/openapi.yaml
@@ -47,5 +45,5 @@ knowledge:
       cd services/filmes-api && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew bootRun
       # smoke: curl localhost:8080/v1/movies
       # 2) App (terminal 2, com emulador Android 11+ aberto):
-      cd apps/filmes-flix && JAVA_HOME="$HOME/.jdks/jdk11" ./gradlew installDebug
+      cd apps/filmes-flix && JAVA_HOME="$HOME/.jdks/jdk17" ./gradlew installDebug
       # O app chama http://10.0.2.2:8080/ = localhost do host visto pelo emulador.

@@ -37,10 +37,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Submodule GuerraAna/FilmesFlix is private — GITHUB_TOKEN only
-          # covers this repo. APP_SUBMODULE_TOKEN is a fine-grained PAT
-          # with Contents: Read on FilmesFlix (see README/AGENTS.md).
-          token: ${{ secrets.APP_SUBMODULE_TOKEN }}
+          # Submodule GuerraAna/FilmesFlix is public — default GITHUB_TOKEN
+          # can clone it. If it ever goes private again, this job needs
+          # token: ${{ secrets.APP_SUBMODULE_TOKEN }} (see AGENTS.md).
           submodules: true
       # Note: the legacy 'tools' package no longer exists in the sdkmanager repo.
       - uses: android-actions/setup-android@v3
