@@ -5,8 +5,7 @@
 # Uso:
 #   ./scripts/run-slice.sh <NNN>           # ex: ./scripts/run-slice.sh 005
 #   SLICE_JDK17=/path/to/jdk17 \
-#   SLICE_JDK11=/path/to/jdk11 \
-#     ./scripts/run-slice.sh 005           # JDKs explícitos (ver AGENTS.md)
+#     ./scripts/run-slice.sh 005           # JDK explícito (ver AGENTS.md)
 #
 # O que o script faz:
 #   1. Localiza docs/slices/NNN-*.md e lista os checkpoints numerados.
@@ -23,7 +22,6 @@ WORKSPACE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$WORKSPACE_ROOT"
 
 JDK17="${SLICE_JDK17:-/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home}"
-JDK11="${SLICE_JDK11:-/opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home}"
 
 # ---------------------------------------------------------------- helpers ---
 log()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -56,7 +54,7 @@ verify_all() { # bateria completa de verificações do AGENTS.md
   run_check "contrato: redocly lint" npx --yes @redocly/cli@1 lint contracts/openapi.yaml || failures=$((failures + 1))
   run_check "BFF: test + coverage" env JAVA_HOME="$JDK17" ./gradlew -p services/filmes-api test jacocoTestCoverageVerification || failures=$((failures + 1))
   if [ -d apps/filmes-flix/app ]; then
-    run_check "app: unit tests + coverage" env JAVA_HOME="$JDK11" ./gradlew -p apps/filmes-flix testDebugUnitTest jacocoTestReport || failures=$((failures + 1))
+    run_check "app: unit tests + coverage" env JAVA_HOME="$JDK17" ./gradlew -p apps/filmes-flix testDebugUnitTest jacocoTestReport || failures=$((failures + 1))
   else
     warn "submodule apps/filmes-flix não inicializado — pulando testes do app"
   fi
