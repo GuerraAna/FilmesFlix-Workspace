@@ -8,7 +8,7 @@ Leia este arquivo inteiro antes de qualquer alteração.
 
 | Caminho | O que é | Stack |
 |---|---|---|
-| `apps/filmes-flix/` | App Android (git submodule de `GuerraAna/FilmesFlix`) | Kotlin, MVVM, Clean Architecture, Retrofit, Coil, LiveData, XML |
+| `apps/filmes-flix/` | App Android (git submodule de `GuerraAna/FilmesFlix`) | Kotlin, MVVM, Clean Architecture, Jetpack Compose (M3), Hilt, Room, Retrofit, Coroutines/Flow |
 | `services/filmes-api/` | BFF próprio que serve o app | Kotlin + Spring Boot 3 (WebFlux), Gradle Kotlin DSL |
 | `contracts/openapi.yaml` | **Fonte da verdade** do contrato entre app e BFF | OpenAPI 3.1 |
 | `docs/slices/` | Slice specs (uma feature = um arquivo numerado) | Markdown |
@@ -39,7 +39,7 @@ Leia este arquivo inteiro antes de qualquer alteração.
 - **Não invente API externa.** Se a API de filmes não tiver o dado, use o mock e registre a limitação na slice.
 - **Comandos de verificação** (rodar antes de finalizar):
   - BFF: `cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew test jacocoTestCoverageVerification`
-  - App: `cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest jacocoTestReport`
+  - App: `cd apps/filmes-flix && JAVA_HOME=$JDK17 ./gradlew testDebugUnitTest jacocoTestReport`
   - Contrato: `npx @redocly/cli lint contracts/openapi.yaml`
   - Tudo de uma vez (com medição de tempo por checkpoint): `./scripts/run-slice.sh NNN`
 - **Testes de contrato.** `ContractTest` (BFF: `api/ContractTest.kt`; app: `data/remote/ContractTest.kt`)
@@ -61,43 +61,48 @@ Cada módulo exige uma JVM diferente — não assuma que o `java` padrão do she
 | Módulo | Ferramenta | JVM exigida | Por quê |
 |---|---|---|---|
 | `services/filmes-api` | Gradle 8.12, Spring Boot 3 | **JDK 17** (toolchain) | `build.gradle.kts` fixa `languageVersion = 17` |
-| `apps/filmes-flix` | Gradle 6.5, AGP 4.1.1 | **JDK 11** | Gradle 6.5 não roda em JVM > 14 |
+| `apps/filmes-flix` | Gradle 8.10, AGP 8.6, Kotlin 2.0 | **JDK 17** | AGP 8 exige JDK 17 para rodar |
 | `contracts/` | redocly via `npx` | Node 20+ | lint do OpenAPI |
 
 Setup macOS (brew, sem sudo):
 
 ```bash
-brew install openjdk@17 openjdk@11
+brew install openjdk@17
 JDK17=/opt/homebrew/opt/openjdk@17   # ajuste se não for Apple Silicon
-JDK11=/opt/homebrew/opt/openjdk@11
 # Gradle não detecta JDKs keg-only do brew sozinho:
-echo "org.gradle.java.installations.paths=$JDK17/libexec/openjdk.jdk/Contents/Home,$JDK11/libexec/openjdk.jdk/Contents/Home" \
+echo "org.gradle.java.installations.paths=$JDK17/libexec/openjdk.jdk/Contents/Home" \
   >> ~/.gradle/gradle.properties
 ```
 
 App Android:
 
-- SDK precisa de `platforms;android-30` e `build-tools;30.0.3` (`compileSdkVersion 30` no `app/build.gradle`).
+- SDK precisa de `platforms;android-35` e `build-tools;35.0.0` (`compileSdk 35` no `app/build.gradle.kts`).
 - Crie `apps/filmes-flix/local.properties` com `sdk.dir=<caminho do Android SDK>` (arquivo gitignored).
-- O app chama o BFF em `http://10.0.2.2:8080/` (`data/remote/MovieApiClient.kt`) — loopback do
+- O app chama o BFF em `http://10.0.2.2:8080/` (`BASE_URL` em `di/AppModule.kt`) — loopback do
   **emulador** para o host. Em aparelho físico, troque pelo IP da máquina na rede.
 - `usesCleartextTraffic="true"` está liberado no manifest porque o BFF local é HTTP.
 
 Modos de execução (detalhes nos blueprints `environment.yaml` na raiz e em `blueprints/`):
 
 - **Só BFF**: `cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew bootRun` → `curl localhost:8080/v1/movies`
-- **Só app**: `cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest` (compila/testa sem backend; rodar no emulador exige o BFF no ar)
-- **Acoplado**: suba o BFF (`bootRun`), abra um emulador Android 11+ e `JAVA_HOME=$JDK11 ./gradlew installDebug` no app.
+- **Só app**: `cd apps/filmes-flix && JAVA_HOME=$JDK17 ./gradlew testDebugUnitTest` (compila/testa sem backend; rodar no emulador exige o BFF no ar — sem rede, a lista cai no cache do Room)
+- **Acoplado**: suba o BFF (`bootRun`), abra um emulador Android 11+ e `JAVA_HOME=$JDK17 ./gradlew installDebug` no app.
 
 ## Convenções do app (`apps/filmes-flix`)
 
 - Pacote raiz: `com.br.natanfc.filmesflix`.
-- Camadas alvo: `data/` (remote, dto, mapper, repository impl), `domain/` (model, repository interface,
-  usecase), `presentation/` (activity/fragment, adapter, viewmodel).
-- Estado de tela via `LiveData<UiState>` (Loading / Success / Error). Nunca expor `Movie` cru na View.
-- `kotlin-android-extensions` (synthetics) está deprecado: novas telas usam **ViewBinding**.
-- Model atual: `Movie(id, titulo, imagem, descricao, dataLancamento)` — campos em português vêm da API
-  legada; o BFF deve expor nomes em inglês e o app mapeia via `mapper`.
+- Camadas alvo: `data/` (remote/dto, local/Room, mapper, repository impl), `domain/` (model,
+  repository interface, usecase `observe*`/`refresh*`), `presentation/` (screens Compose,
+  viewmodel, `ui/theme`, `navigation`).
+- UI em **Jetpack Compose** (Material 3 + Navigation Compose). XML só para recursos
+  (strings, tema plataforma do manifest). Não recriar layouts/adapters/ViewBinding.
+- Estado de tela via `StateFlow<UiState>` (Loading / Success / Error) coletado com
+  `collectAsStateWithLifecycle`. Nunca expor `Movie` cru na View.
+- DI via **Hilt**: `@HiltViewModel` + `@Inject`; args de navegação via `SavedStateHandle`.
+- **Offline-first**: Room é a fonte de verdade (`Flow` do DAO); a rede só alimenta o cache
+  via `refresh*`. Payloads de summary têm `upsert` parcial para não apagar campos de detail.
+- Model atual: `Movie(id, title, posterUrl, overview, releaseDate)` — nomes em inglês,
+  alinhados ao contrato; o app mapeia DTO → Entity → Domain via `data/mapper`.
 
 ## CI: submodule privado
 

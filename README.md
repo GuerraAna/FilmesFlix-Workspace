@@ -52,6 +52,7 @@ git submodule update --init --recursive
 | 005 | Testes de contrato | validar DTOs do app e BFF vs OpenAPI | concluída — PR GuerraAna/FilmesFlix#6 aguardando merge |
 | 006 | Coverage reports | JaCoCo + testes de ViewModel | concluída — PR GuerraAna/FilmesFlix#6 aguardando merge |
 | 007 | Automatizar pipeline de slices | `scripts/run-slice.sh` com medição de tempo | concluída |
+| 008 | Modernização do app | Compose + Flow + Hilt + Room, toolchain moderna (AGP 8/Kotlin 2/JDK 17) | concluída |
 
 > As mudanças do app (slices 005+006) estão consolidadas em uma única PR
 > (GuerraAna/FilmesFlix#6, branch `feature/contract-tests-and-coverage`) sem merge até
