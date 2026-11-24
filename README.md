@@ -62,8 +62,8 @@ git submodule update --init --recursive
 
 Pré-requisitos (detalhes em `AGENTS.md` → "Ambiente de desenvolvimento"):
 
-- **JDK 17** para o BFF e **JDK 11** para o app — o `java` padrão do shell não serve para os dois.
-- **Android SDK** com `platforms;android-30` + `build-tools;30.0.3`.
+- **JDK 17** para o BFF e para o app — o `java` padrão do shell pode não servir para os dois.
+- **Android SDK** com `platforms;android-35` + `build-tools;35.0.0`.
 - **Node 20+** (para `npx @redocly/cli lint`, lint do contrato).
 - Blueprints prontos em `environment.yaml` (raiz, acoplado) e `blueprints/bff-only.yaml` — o app também tem o seu em `GuerraAna/FilmesFlix`.
 
@@ -75,16 +75,15 @@ git clone --recurse-submodules https://github.com/GuerraAna/FilmesFlix-Workspace
 cd FilmesFlix-Workspace
 
 # 2. JDKs — macOS+brew (ajuste para seu OS; Linux: apt/yum ou https://adoptium.net)
-brew install openjdk@17 openjdk@11
+brew install openjdk@17
 JDK17=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home   # Intel: /usr/local/opt/...
-JDK11=/opt/homebrew/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home
 
 # Gradle não detecta JDKs keg-only do brew sozinho — registre uma vez:
-echo "org.gradle.java.installations.paths=$JDK17,$JDK11" >> ~/.gradle/gradle.properties
+echo "org.gradle.java.installations.paths=$JDK17" >> ~/.gradle/gradle.properties
 
 # 3. Android SDK — via Android Studio (SDK Manager) OU linha de comando:
 #    instale cmdline-tools em ~/Library/Android/sdk (macOS) e rode:
-sdkmanager "platforms;android-30" "build-tools;30.0.3"
+sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
 # 4. Arquivo LOCAL do app — NÃO commitar (já está no .gitignore):
 echo "sdk.dir=$HOME/Library/Android/sdk" > apps/filmes-flix/local.properties
@@ -108,10 +107,10 @@ Estes arquivos contêm caminhos da sua máquina ou segredos e **ficam apenas loc
 cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew bootRun     # http://localhost:8080/v1/movies
 
 # Só app (testes/build; rodar no emulador exige o BFF no ar)
-cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest
+cd apps/filmes-flix && JAVA_HOME=$JDK17 ./gradlew testDebugUnitTest
 
 # Acoplado: BFF no ar + emulador Android 11+ aberto
-cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew installDebug   # app chama http://10.0.2.2:8080/
+cd apps/filmes-flix && JAVA_HOME=$JDK17 ./gradlew installDebug   # app chama http://10.0.2.2:8080/
 ```
 
 ### Verificação completa (CI local)
@@ -122,7 +121,7 @@ cd apps/filmes-flix && JAVA_HOME=$JDK11 ./gradlew installDebug   # app chama htt
 
 # Ou manualmente:
 cd services/filmes-api && JAVA_HOME=$JDK17 ./gradlew test jacocoTestCoverageVerification
-cd apps/filmes-flix  && JAVA_HOME=$JDK11 ./gradlew testDebugUnitTest jacocoTestReport
+cd apps/filmes-flix  && JAVA_HOME=$JDK17 ./gradlew testDebugUnitTest jacocoTestReport
 npx --yes @redocly/cli lint contracts/openapi.yaml
 ```
 
